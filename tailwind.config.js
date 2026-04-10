@@ -5,9 +5,9 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ["'Cormorant Garamond'", "Georgia", "serif"],
-        sans: ["'Cabinet Grotesk'", "'DM Sans'", "sans-serif"],
-        mono: ["'DM Mono'", "monospace"],
+        display: ["'Clash Display'", "'Cabinet Grotesk'", "sans-serif"],
+        sans:    ["'Cabinet Grotesk'", "'DM Sans'", "sans-serif"],
+        mono:    ["'DM Mono'", "monospace"],
       },
       colors: {
         parchment: {

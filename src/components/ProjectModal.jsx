@@ -74,7 +74,7 @@ export default function ProjectModal({ project, onClose }) {
               >
                 {project.category}
               </span>
-              <h2 className="font-display font-light text-2xl md:text-3xl leading-tight tracking-tight" style={{ color: "#fdfaf5" }}>
+              <h2 className="font-display text-2xl md:text-3xl leading-tight" style={{ fontWeight: 600, letterSpacing: "-0.02em" }} style={{ color: "#fdfaf5" }}>
                 {project.title}
               </h2>
             </div>
@@ -104,7 +104,7 @@ export default function ProjectModal({ project, onClose }) {
             {/* Overview — italic display serif */}
             <div>
               <p className="font-mono text-[10px] tracking-[0.22em] uppercase mb-3" style={{ color: "#b5451b" }}>Overview</p>
-              <p className="font-display font-light italic text-xl md:text-2xl leading-snug text-ink-700 dark:text-ink-300">
+              <p className="font-display text-xl md:text-2xl leading-snug text-ink-700 dark:text-ink-300">
                 {project.overview}
               </p>
             </div>

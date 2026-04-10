@@ -34,7 +34,7 @@ export default function Nav() {
     >
       <div className="max-w-[1320px] mx-auto px-6 md:px-12 flex items-center justify-between h-16">
         <a href="#"
-          className="font-display text-xl font-semibold tracking-tight text-ink-900 dark:text-parchment-100">
+          className="font-display text-xl tracking-tight text-ink-900 dark:text-parchment-100">
           Marvin<span style={{ color: "#b5451b" }} className="font-light italic">.</span>
         </a>
 

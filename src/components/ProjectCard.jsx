@@ -83,7 +83,7 @@ export default function ProjectCard({ project, index, onOpen, featured }) {
       <div className="flex items-start justify-between gap-4">
         <div>
           <motion.h3
-            className="font-display font-light leading-tight tracking-tight mb-1"
+            className="font-display leading-tight tracking-tight mb-1"
             animate={{ color: hovered ? "#b5451b" : undefined, fontStyle: hovered ? "italic" : "normal" }}
             transition={{ duration: 0.22 }}
             style={{ fontSize: "clamp(1.1rem,1.8vw,1.45rem)", color: "inherit" }}
