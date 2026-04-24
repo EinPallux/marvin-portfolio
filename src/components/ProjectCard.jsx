@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight } from "@phosphor-icons/react";
+import { useNavigate } from "react-router-dom";
 
-export default function ProjectCard({ project, index, onOpen, size = "normal" }) {
+export default function ProjectCard({ project, index, size = "normal" }) {
   const [hov, setHov] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <motion.article
@@ -11,7 +13,7 @@ export default function ProjectCard({ project, index, onOpen, size = "normal" })
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ delay: index * 0.08, type: "spring", duration: 0.7, bounce: 0 }}
-      onClick={() => onOpen(project)}
+      onClick={() => navigate(`/work/${project.id}`)}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       className="group cursor-pointer"
@@ -87,7 +89,7 @@ export default function ProjectCard({ project, index, onOpen, size = "normal" })
           <p className="text-[13px] text-zinc-500 dark:text-zinc-500 leading-snug">{project.subtitle}</p>
         </div>
 
-        {/* Tag chips with reveal-on-hover for extras */}
+        {/* Tag chips */}
         <div className="flex flex-wrap gap-1.5 justify-end flex-shrink-0 mt-0.5">
           {project.tags.slice(0, 2).map(t => (
             <span key={t} className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800">

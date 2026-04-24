@@ -2,12 +2,10 @@ import { useState, useRef } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import { projects } from "../data/projects";
 import ProjectCard from "./ProjectCard";
-import ProjectModal from "./ProjectModal";
 
 const CATEGORIES = ["All", ...Array.from(new Set(projects.map(p => p.category)))];
 
 export default function Work() {
-  const [active, setActive] = useState(null);
   const [filter, setFilter] = useState("All");
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
@@ -67,7 +65,7 @@ export default function Work() {
             {/* Featured — full width */}
             {featured && (
               <div className="mb-5">
-                <ProjectCard project={featured} index={0} onOpen={setActive} size="large" />
+                <ProjectCard project={featured} index={0} size="large" />
               </div>
             )}
 
@@ -75,17 +73,13 @@ export default function Work() {
             {rest.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {rest.map((p, i) => (
-                  <ProjectCard key={p.id} project={p} index={i + 1} onOpen={setActive} />
+                  <ProjectCard key={p.id} project={p} index={i + 1} />
                 ))}
               </div>
             )}
           </motion.div>
         </AnimatePresence>
       </div>
-
-      <AnimatePresence>
-        {active && <ProjectModal project={active} onClose={() => setActive(null)} />}
-      </AnimatePresence>
     </section>
   );
 }
