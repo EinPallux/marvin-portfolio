@@ -1,10 +1,8 @@
 import { useEffect, useRef } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
 import { motion, useInView } from "framer-motion";
 import { ArrowLeft, ArrowUpRight, ArrowRight } from "@phosphor-icons/react";
 import { projects } from "../data/projects";
-import CursorGlow from "../components/CursorGlow";
-import Nav from "../components/Nav";
+import Nav from "./Nav";
 
 const stagger = {
   hidden: {},
@@ -15,49 +13,33 @@ const up = {
   show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { type: "spring", duration: 0.7, bounce: 0 } },
 };
 
-export default function ProjectDetail() {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const project = projects.find(p => p.id === id);
+export default function ProjectDetail({ project, onBack, onNavigate }) {
   const bodyRef = useRef(null);
   const bodyInView = useInView(bodyRef, { once: true, margin: "-60px" });
 
-  // Scroll to top on mount
+  // Scroll to top when project changes
   useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [id]);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, [project.id]);
 
-  // Keyboard escape → back
+  // Escape key → back
   useEffect(() => {
-    const fn = e => { if (e.key === "Escape") navigate(-1); };
+    const fn = e => { if (e.key === "Escape") onBack(); };
     window.addEventListener("keydown", fn);
     return () => window.removeEventListener("keydown", fn);
-  }, [navigate]);
+  }, [onBack]);
 
-  if (!project) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-zinc-950">
-        <div className="text-center">
-          <p className="font-mono text-[13px] text-zinc-400 mb-4">Project not found</p>
-          <Link to="/" className="text-accent underline text-[14px]">← Back home</Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Find next project for the "Next →" card at the bottom
-  const currentIndex = projects.findIndex(p => p.id === id);
+  const currentIndex = projects.findIndex(p => p.id === project.id);
   const nextProject = projects[(currentIndex + 1) % projects.length];
 
   return (
     <div className="min-h-screen bg-white dark:bg-zinc-950">
-      <div className="grain-overlay" aria-hidden="true" />
-      <CursorGlow />
       <Nav />
 
-      {/* ── Hero image ─────────────────────────────────────── */}
+      {/* ── Hero image ─────────────────────────────────── */}
       <div className="relative w-full overflow-hidden" style={{ height: "clamp(300px, 55vw, 680px)" }}>
         <motion.img
+          key={project.id}
           src={project.coverImage}
           alt={project.title}
           className="w-full h-full object-cover"
@@ -65,24 +47,28 @@ export default function ProjectDetail() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
         />
-        {/* Gradient scrim */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-        {/* Back button — floats over hero */}
+        {/* Back button */}
         <motion.button
           initial={{ opacity: 0, x: -12 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.3, type: "spring", duration: 0.5, bounce: 0 }}
-          onClick={() => navigate(-1)}
+          onClick={onBack}
           className="absolute top-20 left-6 md:left-10 flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium text-white/90 hover:text-white transition-colors"
-          style={{ background: "rgba(0,0,0,0.35)", backdropFilter: "blur(12px)", border: "0.5px solid rgba(255,255,255,0.15)" }}
+          style={{
+            background: "rgba(0,0,0,0.35)",
+            backdropFilter: "blur(12px)",
+            border: "0.5px solid rgba(255,255,255,0.15)",
+          }}
         >
           <ArrowLeft size={13} weight="bold" />
           Back
         </motion.button>
 
-        {/* Hero text over image */}
+        {/* Hero text */}
         <motion.div
+          key={`hero-text-${project.id}`}
           variants={stagger}
           initial="hidden"
           animate="show"
@@ -107,10 +93,10 @@ export default function ProjectDetail() {
         </motion.div>
       </div>
 
-      {/* ── Body ───────────────────────────────────────────── */}
+      {/* ── Body ───────────────────────────────────────── */}
       <div ref={bodyRef} className="max-w-[1200px] mx-auto px-6 md:px-10 py-20">
 
-        {/* Meta row — tags + year + links */}
+        {/* Meta row */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={bodyInView ? { opacity: 1, y: 0 } : {}}
@@ -155,22 +141,21 @@ export default function ProjectDetail() {
           </div>
         </motion.div>
 
-        {/* Two-col: overview + challenge/solution */}
+        {/* Overview + Challenge/Solution */}
         <motion.div
+          key={`body-${project.id}`}
           variants={stagger}
           initial="hidden"
           animate={bodyInView ? "show" : "hidden"}
           className="grid grid-cols-1 lg:grid-cols-[1.2fr_1fr] gap-16 mb-20"
         >
-          {/* Overview */}
           <motion.div variants={up}>
             <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-accent mb-4">Overview</p>
-            <p className="text-[clamp(1.15rem,2.5vw,1.5rem)] font-medium leading-snug tracking-tight text-zinc-800 dark:text-zinc-200">
+            <p className="text-[clamp(1.1rem,2.5vw,1.45rem)] font-medium leading-snug tracking-tight text-zinc-800 dark:text-zinc-200">
               {project.overview}
             </p>
           </motion.div>
 
-          {/* Challenge + Solution stacked */}
           <motion.div variants={up} className="flex flex-col gap-4">
             {[
               { label: "Challenge", text: project.challenge },
@@ -248,36 +233,35 @@ export default function ProjectDetail() {
           </motion.div>
         )}
 
-        {/* ── Next project ───────────────────────────────── */}
+        {/* Next project */}
         <div className="border-t border-zinc-100 dark:border-zinc-900 pt-16">
           <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-zinc-400 dark:text-zinc-600 mb-6">
             Next Project
           </p>
           <motion.div
-            whileHover="hov"
-            onClick={() => { navigate(`/work/${nextProject.id}`); window.scrollTo(0, 0); }}
-            className="group cursor-pointer"
+            whileHover={{ scale: 1.01 }}
+            transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+            onClick={() => onNavigate(nextProject)}
+            className="group cursor-pointer flex items-center justify-between gap-6 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 hover:border-accent/30 transition-all duration-300 hover:bg-zinc-50 dark:hover:bg-zinc-900/40"
           >
-            <div className="flex items-center justify-between gap-6 p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 hover:border-accent/30 transition-all duration-300 hover:bg-zinc-50 dark:hover:bg-zinc-900/40">
-              <div className="flex items-center gap-5 min-w-0">
-                <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
-                  <img
-                    src={nextProject.coverImage}
-                    alt={nextProject.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-zinc-400 mb-1">{nextProject.category}</p>
-                  <h3 className="text-[17px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 group-hover:text-accent transition-colors truncate">
-                    {nextProject.title}
-                  </h3>
-                  <p className="text-[13px] text-zinc-500 truncate">{nextProject.subtitle}</p>
-                </div>
+            <div className="flex items-center gap-5 min-w-0">
+              <div className="w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                <img
+                  src={nextProject.coverImage}
+                  alt={nextProject.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
               </div>
-              <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 group-hover:bg-accent group-hover:text-white transition-all duration-200 text-zinc-500">
-                <ArrowRight size={15} weight="bold" />
+              <div className="min-w-0">
+                <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-zinc-400 mb-1">{nextProject.category}</p>
+                <h3 className="text-[17px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 group-hover:text-accent transition-colors truncate">
+                  {nextProject.title}
+                </h3>
+                <p className="text-[13px] text-zinc-500 truncate">{nextProject.subtitle}</p>
               </div>
+            </div>
+            <div className="w-10 h-10 rounded-full flex-shrink-0 flex items-center justify-center bg-zinc-100 dark:bg-zinc-800 group-hover:bg-accent group-hover:text-white transition-all duration-200 text-zinc-500">
+              <ArrowRight size={15} weight="bold" />
             </div>
           </motion.div>
         </div>

@@ -5,7 +5,7 @@ import ProjectCard from "./ProjectCard";
 
 const CATEGORIES = ["All", ...Array.from(new Set(projects.map(p => p.category)))];
 
-export default function Work() {
+export default function Work({ onOpen }) {
   const [filter, setFilter] = useState("All");
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
@@ -17,7 +17,6 @@ export default function Work() {
     <section id="work" ref={ref} className="py-32 md:py-40 bg-canvas-light dark:bg-zinc-950">
       <div className="max-w-[1200px] mx-auto px-6 md:px-10">
 
-        {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -31,7 +30,6 @@ export default function Work() {
             </h2>
           </div>
 
-          {/* Filter tabs */}
           <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 w-fit">
             {CATEGORIES.map(cat => (
               <button
@@ -53,7 +51,6 @@ export default function Work() {
           </div>
         </motion.div>
 
-        {/* Bento grid */}
         <AnimatePresence mode="wait">
           <motion.div
             key={filter}
@@ -62,18 +59,15 @@ export default function Work() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ type: "spring", duration: 0.45, bounce: 0 }}
           >
-            {/* Featured — full width */}
             {featured && (
               <div className="mb-5">
-                <ProjectCard project={featured} index={0} size="large" />
+                <ProjectCard project={featured} index={0} onOpen={onOpen} size="large" />
               </div>
             )}
-
-            {/* Rest — asymmetric 3-column */}
             {rest.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {rest.map((p, i) => (
-                  <ProjectCard key={p.id} project={p} index={i + 1} />
+                  <ProjectCard key={p.id} project={p} index={i + 1} onOpen={onOpen} />
                 ))}
               </div>
             )}

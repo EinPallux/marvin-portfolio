@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight } from "@phosphor-icons/react";
-import { useNavigate } from "react-router-dom";
 
-export default function ProjectCard({ project, index, size = "normal" }) {
+export default function ProjectCard({ project, index, onOpen, size = "normal" }) {
   const [hov, setHov] = useState(false);
-  const navigate = useNavigate();
 
   return (
     <motion.article
@@ -13,13 +11,12 @@ export default function ProjectCard({ project, index, size = "normal" }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ delay: index * 0.08, type: "spring", duration: 0.7, bounce: 0 }}
-      onClick={() => navigate(`/work/${project.id}`)}
+      onClick={() => onOpen(project)}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       className="group cursor-pointer"
       style={{ willChange: "transform" }}
     >
-      {/* Image */}
       <div
         className={`relative overflow-hidden rounded-2xl mb-4 ${size === "large" ? "aspect-[16/9]" : "aspect-[4/3]"}`}
         style={{
@@ -29,7 +26,6 @@ export default function ProjectCard({ project, index, size = "normal" }) {
           transition: "box-shadow 0.4s ease",
         }}
       >
-        {/* Clip-path scroll reveal */}
         <motion.div
           className="w-full h-full"
           initial={{ clipPath: "inset(100% 0 0 0)" }}
@@ -46,14 +42,12 @@ export default function ProjectCard({ project, index, size = "normal" }) {
           />
         </motion.div>
 
-        {/* Dark scrim on hover */}
         <motion.div
           className="absolute inset-0 pointer-events-none"
           animate={{ background: hov ? "rgba(0,0,0,0.35)" : "rgba(0,0,0,0)" }}
           transition={{ duration: 0.3 }}
         />
 
-        {/* Hover overlay content */}
         <motion.div
           className="absolute inset-0 flex items-end justify-between p-5 pointer-events-none"
           animate={{ opacity: hov ? 1 : 0, y: hov ? 0 : 8 }}
@@ -67,7 +61,6 @@ export default function ProjectCard({ project, index, size = "normal" }) {
           </div>
         </motion.div>
 
-        {/* Year badge */}
         <div
           className="absolute top-3 right-3 font-mono text-[10px] tracking-wide px-2 py-1 rounded-md"
           style={{ background: "rgba(255,255,255,0.88)", color: "#52525b", backdropFilter: "blur(8px)" }}
@@ -76,7 +69,6 @@ export default function ProjectCard({ project, index, size = "normal" }) {
         </div>
       </div>
 
-      {/* Caption */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <motion.h3
@@ -89,7 +81,6 @@ export default function ProjectCard({ project, index, size = "normal" }) {
           <p className="text-[13px] text-zinc-500 dark:text-zinc-500 leading-snug">{project.subtitle}</p>
         </div>
 
-        {/* Tag chips */}
         <div className="flex flex-wrap gap-1.5 justify-end flex-shrink-0 mt-0.5">
           {project.tags.slice(0, 2).map(t => (
             <span key={t} className="font-mono text-[10px] px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-500 border border-zinc-200 dark:border-zinc-800">
