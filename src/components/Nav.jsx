@@ -33,9 +33,12 @@ export default function Nav() {
       }}
     >
       <div className="max-w-[1320px] mx-auto px-6 md:px-12 flex items-center justify-between h-16">
+        {/* Logo — NO italic, Clash Display has no italic variant */}
         <a href="#"
-          className="font-display text-xl tracking-tight text-ink-900 dark:text-parchment-100">
-          Marvin<span style={{ color: "#b5451b" }} className="font-light italic">.</span>
+          className="font-display text-xl tracking-tight text-ink-900 dark:text-parchment-100"
+          style={{ fontWeight: 600, letterSpacing: "-0.02em" }}>
+          Marvin
+          <span style={{ color: "#b5451b", fontWeight: 400 }}>.</span>
         </a>
 
         <div className="flex items-center gap-1">
@@ -53,10 +56,10 @@ export default function Nav() {
             style={{ borderColor: "rgba(164,140,112,0.4)" }}>
             <AnimatePresence mode="wait" initial={false}>
               <motion.span key={theme}
-                initial={{ rotate: -20, opacity: 0, scale: 0.7 }}
-                animate={{ rotate: 0, opacity: 1, scale: 1 }}
-                exit={{ rotate: 20, opacity: 0, scale: 0.7 }}
-                transition={{ duration: 0.18 }}
+                initial={{ rotate: -20, opacity: 0, scale: 0.7, filter: "blur(4px)" }}
+                animate={{ rotate: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
+                exit={{ rotate: 20, opacity: 0, scale: 0.7, filter: "blur(4px)" }}
+                transition={{ type: "spring", duration: 0.35, bounce: 0 }}
                 className="absolute">
                 {theme === "dark" ? <Sun size={14} weight="light" /> : <Moon size={14} weight="light" />}
               </motion.span>

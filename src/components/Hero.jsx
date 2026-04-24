@@ -181,8 +181,8 @@ export default function Hero() {
 
       {/* Scroll cue */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        transition={{ delay: 1.8, duration: 0.8 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-ink-300 dark:text-ink-700">
+        transition={{ delay: 1.6, duration: 0.6 }}
+        className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-ink-300 dark:text-ink-700">
         <motion.div animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}>
           <ArrowDown size={13} weight="light" />

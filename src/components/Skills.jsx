@@ -20,7 +20,7 @@ function SkillRow({ skill, color, dashed, index, inView }) {
     <motion.div
       initial={{ opacity: 0, x: -16 }}
       animate={inView ? { opacity: 1, x: 0 } : {}}
-      transition={{ delay: index * 0.08, duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: index * 0.08, type: "spring", duration: 0.55, bounce: 0 }}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
       className="py-5 cursor-default"
