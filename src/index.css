@@ -32,9 +32,20 @@
 
 @layer utilities {
   .grain-overlay {
-    position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0.03;
+    position: fixed;
+    /* Extend 10px beyond all edges so the translate animation never reveals a gap */
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    width: calc(100% + 20px);
+    height: calc(100% + 20px);
+    z-index: 60;
+    pointer-events: none;
+    opacity: 0.03;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    background-size: 200px; animation: grain 8s steps(10) infinite;
+    background-size: 200px;
+    animation: grain 8s steps(10) infinite;
   }
   .hide-scrollbar { -ms-overflow-style:none; scrollbar-width:none; }
   .hide-scrollbar::-webkit-scrollbar { display:none; }
@@ -44,12 +55,12 @@
 /* ── Keyframes ───────────────────────────────────────────── */
 
 @keyframes grain {
-  0%,100% { transform:translate(0,0) }
-  10%     { transform:translate(-2%,-3%) }
-  30%     { transform:translate(-1%,4%) }
-  50%     { transform:translate(-3%,3%) }
-  70%     { transform:translate(-2%,2%) }
-  90%     { transform:translate(-1%,1%) }
+  0%,100% { transform: translate(0, 0) }
+  10%     { transform: translate(-2%, -3%) }
+  30%     { transform: translate(-1%, 4%) }
+  50%     { transform: translate(-3%, 3%) }
+  70%     { transform: translate(-2%, 2%) }
+  90%     { transform: translate(-1%, 1%) }
 }
 
 @keyframes marquee {
