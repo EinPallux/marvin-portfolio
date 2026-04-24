@@ -4,58 +4,83 @@ import { projects } from "../data/projects";
 import ProjectCard from "./ProjectCard";
 import ProjectModal from "./ProjectModal";
 
+const CATEGORIES = ["All", ...Array.from(new Set(projects.map(p => p.category)))];
+
 export default function Work() {
   const [active, setActive] = useState(null);
+  const [filter, setFilter] = useState("All");
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const [featured, ...rest] = projects;
+
+  const filtered = filter === "All" ? projects : projects.filter(p => p.category === filter);
+  const [featured, ...rest] = filtered;
 
   return (
-    <section id="work" ref={ref}
-      className="relative py-32 md:py-44 bg-parchment-50 dark:bg-ink-950 overflow-hidden">
-      <span aria-hidden="true" className="absolute select-none pointer-events-none hidden md:block font-display"
-        style={{
-          fontSize: "clamp(12rem,28vw,26rem)", color: "transparent",
-          WebkitTextStroke: "1px rgba(181,69,27,0.055)", lineHeight: 1,
-          right: "-0.1em", top: "0em", letterSpacing: "-0.06em", zIndex: 0, fontWeight: 700,
-        }}>03</span>
+    <section id="work" ref={ref} className="py-32 md:py-40 bg-canvas-light dark:bg-zinc-950">
+      <div className="max-w-[1200px] mx-auto px-6 md:px-10">
 
-      <div className="relative z-10 max-w-[1320px] mx-auto px-6 md:px-12">
+        {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 18 }} animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-14">
+          initial={{ opacity: 0, y: 16 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ type: "spring", duration: 0.7, bounce: 0 }}
+          className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12"
+        >
           <div>
-            <p className="font-mono text-[11px] tracking-[0.22em] uppercase text-ink-400 dark:text-ink-600 mb-5">
-              Work — 03
-            </p>
-            <h2 className="font-display leading-[0.93] text-ink-900 dark:text-parchment-100"
-              style={{ fontSize: "clamp(2.4rem,5.5vw,5.5rem)", fontWeight: 700, letterSpacing: "-0.03em" }}>
-              Selected{" "}
-              <span style={{ fontWeight: 400, color: "#b5451b" }}>Projects.</span>
+            <p className="font-mono text-[11px] tracking-[0.2em] uppercase text-zinc-400 dark:text-zinc-600 mb-4">Work</p>
+            <h2 className="text-[clamp(2.2rem,5vw,4.5rem)] font-bold leading-[1.05] tracking-[-0.035em] text-zinc-900 dark:text-zinc-50">
+              Selected <span style={{ color: "#5b45f5" }}>Projects.</span>
             </h2>
           </div>
-          <p className="font-sans text-sm font-light text-ink-400 dark:text-ink-600 max-w-[36ch] leading-relaxed md:text-right">
-            Click any project to open the full case study.
-          </p>
-        </motion.div>
 
-        {featured && (
-          <div className="mb-10">
-            <ProjectCard project={featured} index={0} onOpen={setActive} featured />
-          </div>
-        )}
-
-        <div className="mb-10" style={{ borderTop: "1px solid rgba(228,208,176,0.5)" }} />
-
-        <div className="grid grid-cols-1 md:grid-cols-[1.45fr_1fr] gap-8 md:gap-10">
-          {rest[0] && <ProjectCard project={rest[0]} index={1} onOpen={setActive} />}
-          <div className="grid grid-cols-1 gap-8 md:gap-10">
-            {rest.slice(1).map((p, i) => (
-              <ProjectCard key={p.id} project={p} index={i + 2} onOpen={setActive} />
+          {/* Filter tabs */}
+          <div className="flex items-center gap-1.5 p-1 rounded-xl bg-zinc-100 dark:bg-zinc-900 w-fit">
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat}
+                onClick={() => setFilter(cat)}
+                className="relative px-3.5 py-1.5 text-[12px] font-medium rounded-lg transition-colors duration-200"
+                style={{ color: filter === cat ? "#fff" : undefined }}
+              >
+                {filter === cat && (
+                  <motion.div
+                    layoutId="filter-pill"
+                    className="absolute inset-0 rounded-lg bg-accent"
+                    transition={{ type: "spring", duration: 0.35, bounce: 0 }}
+                  />
+                )}
+                <span className="relative z-10">{cat}</span>
+              </button>
             ))}
           </div>
-        </div>
+        </motion.div>
+
+        {/* Bento grid */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={filter}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ type: "spring", duration: 0.45, bounce: 0 }}
+          >
+            {/* Featured — full width */}
+            {featured && (
+              <div className="mb-5">
+                <ProjectCard project={featured} index={0} onOpen={setActive} size="large" />
+              </div>
+            )}
+
+            {/* Rest — asymmetric 3-column */}
+            {rest.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {rest.map((p, i) => (
+                  <ProjectCard key={p.id} project={p} index={i + 1} onOpen={setActive} />
+                ))}
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
 
       <AnimatePresence>

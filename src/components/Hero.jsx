@@ -1,203 +1,171 @@
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowDown } from "@phosphor-icons/react";
+import { useRef, useState, useEffect } from "react";
+import { motion, useMotionValue, useTransform, useSpring, AnimatePresence } from "framer-motion";
+import { ArrowRight } from "@phosphor-icons/react";
+
+const ROLES = ["UI/Web Designer", "Creative Technologist", "Vibe-Coder", "AI Builder"];
+
+// Magnetic button — useMotionValue only, no useState for position (performance)
+function MagneticButton({ children, href, primary }) {
+  const ref = useRef(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const sx = useSpring(x, { stiffness: 180, damping: 18, mass: 0.6 });
+  const sy = useSpring(y, { stiffness: 180, damping: 18, mass: 0.6 });
+
+  const handleMouseMove = (e) => {
+    const r = ref.current.getBoundingClientRect();
+    const cx = r.left + r.width / 2;
+    const cy = r.top + r.height / 2;
+    x.set((e.clientX - cx) * 0.28);
+    y.set((e.clientY - cy) * 0.28);
+  };
+  const handleMouseLeave = () => { x.set(0); y.set(0); };
+
+  return (
+    <motion.a
+      ref={ref}
+      href={href}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ x: sx, y: sy, willChange: "transform" }}
+      whileTap={{ scale: 0.97 }}
+      className={`inline-flex items-center gap-2 px-6 py-3 rounded-full text-[14px] font-semibold tracking-[-0.01em] transition-colors duration-200 ${
+        primary
+          ? "bg-accent text-white hover:bg-accent-hover shadow-[0_0_24px_rgba(91,69,245,0.3)]"
+          : "bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-200 hover:bg-zinc-200 dark:hover:bg-zinc-700"
+      }`}
+    >
+      {children}
+    </motion.a>
+  );
+}
 
 const stagger = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+  show: { transition: { staggerChildren: 0.08, delayChildren: 0.2 } },
 };
-const word = {
-  hidden: { opacity: 0, y: 36, filter: "blur(8px)" },
-  show:   { opacity: 1, y: 0, filter: "blur(0px)",
-    transition: { duration: 0.85, ease: [0.16, 1, 0.3, 1] } },
+const up = {
+  hidden: { opacity: 0, y: 24, filter: "blur(6px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { type: "spring", duration: 0.7, bounce: 0 } },
 };
-
-const marqueeWords = [
-  "UI Design", "Visual Identity", "Figma", "Branding",
-  "AI Integration", "Vibe-Coding", "Typography", "Art Direction",
-  "UI Design", "Visual Identity", "Figma", "Branding",
-  "AI Integration", "Vibe-Coding", "Typography", "Art Direction",
-];
-
-// Animated SVG underline stroke
-function ScribbleUnderline() {
-  return (
-    <svg viewBox="0 0 320 18" fill="none" xmlns="http://www.w3.org/2000/svg"
-      className="w-full" aria-hidden="true" style={{ overflow: "visible" }}>
-      <motion.path
-        d="M6 13 C 55 3, 110 17, 165 8 C 215 0, 265 15, 314 7"
-        stroke="#b5451b" strokeWidth="2.5" strokeLinecap="round" fill="none"
-        initial={{ pathLength: 0, opacity: 0 }}
-        animate={{ pathLength: 1, opacity: 0.8 }}
-        transition={{ duration: 1.4, delay: 0.9, ease: [0.16, 1, 0.3, 1] }}
-      />
-    </svg>
-  );
-}
-
-// Ghost display letter — outlined, very faint
-function GhostLetter({ children }) {
-  return (
-    <span aria-hidden="true" className="absolute select-none pointer-events-none font-display"
-      style={{
-        fontSize: "clamp(12rem,24vw,24rem)",
-        color: "transparent",
-        WebkitTextStroke: "1px rgba(181,69,27,0.09)",
-        lineHeight: 1,
-        right: "-0.04em",
-        top: "-0.14em",
-        letterSpacing: "-0.04em",
-        zIndex: 0,
-        fontWeight: 700,
-      }}>
-      {children}
-    </span>
-  );
-}
 
 export default function Hero() {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const yParallax   = useTransform(scrollYProgress, [0, 1], ["0%", "16%"]);
-  const opacityFade = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const [roleIndex, setRoleIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setRoleIndex(i => (i + 1) % ROLES.length), 2800);
+    return () => clearInterval(id);
+  }, []);
 
   return (
-    <section ref={ref} id="hero"
-      className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden bg-parchment-50 dark:bg-ink-950">
-
-      {/* Warm ambient wash */}
-      <div className="absolute inset-0 pointer-events-none" style={{
-        background: "radial-gradient(ellipse 80% 55% at 55% 35%, rgba(228,208,176,0.45) 0%, transparent 65%)",
-      }} />
-
-      {/* Left editorial column rule */}
-      <motion.div
-        className="absolute left-[7vw] top-0 bottom-0 hidden md:block pointer-events-none"
-        initial={{ scaleY: 0 }} animate={{ scaleY: 1 }}
-        transition={{ duration: 1.1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+    <section
+      id="hero"
+      className="relative min-h-[100dvh] flex flex-col justify-center overflow-hidden bg-white dark:bg-zinc-950"
+    >
+      {/* Subtle radial gradient */}
+      <div
+        className="absolute inset-0 pointer-events-none"
         style={{
-          width: "1px", transformOrigin: "top",
-          background: "linear-gradient(to bottom, transparent, rgba(181,69,27,0.15) 20%, rgba(181,69,27,0.15) 80%, transparent)",
+          background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(91,69,245,0.06) 0%, transparent 65%)",
         }}
       />
 
-      <motion.div style={{ y: yParallax, opacity: opacityFade }}
-        className="relative max-w-[1320px] mx-auto px-6 md:px-12 pt-28 pb-24 w-full">
+      <div className="relative max-w-[1200px] mx-auto px-6 md:px-10 pt-28 pb-20 w-full">
+        <motion.div variants={stagger} initial="hidden" animate="show" className="max-w-[820px]">
 
-        {/* Meta row */}
-        <motion.div
-          initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.05, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-          className="flex items-center gap-3 mb-14 md:mb-20">
-          <span className="w-1.5 h-1.5 rounded-full flex-shrink-0"
-            style={{ background: "#b5451b", boxShadow: "0 0 8px rgba(181,69,27,0.55)" }} />
-          <span className="font-mono text-[11px] tracking-[0.22em] uppercase text-ink-400 dark:text-ink-500">
-            Portfolio — 2025/26
-          </span>
-          <span className="hidden md:inline font-mono text-[11px] text-ink-300 dark:text-ink-700 mx-2">—</span>
-          <span className="hidden md:inline font-mono text-[11px] tracking-[0.14em] text-ink-300 dark:text-ink-700">
-            Based in Germany
-          </span>
-        </motion.div>
-
-        {/* Headline block */}
-        <div className="relative">
-          <GhostLetter>M</GhostLetter>
-
-          <motion.div variants={stagger} initial="hidden" animate="show" className="relative z-10">
-            {/* "Hi, I'm" — lighter weight contrast line */}
-            <div className="overflow-hidden">
-              <motion.p variants={word}
-                className="font-display text-[clamp(1.2rem,2.5vw,2.4rem)] leading-none mb-3 text-ink-400 dark:text-ink-500"
-                style={{ fontWeight: 400, letterSpacing: "0.01em" }}>
-                Hi, I&rsquo;m
-              </motion.p>
-            </div>
-
-            {/* Main name — max weight, rust */}
-            <div className="overflow-hidden mb-2">
-              <motion.h1 variants={word}
-                className="font-display leading-[0.9]"
-                style={{
-                  fontSize: "clamp(4.5rem,13vw,13rem)",
-                  fontWeight: 700,
-                  letterSpacing: "-0.03em",
-                  color: "#b5451b",
-                }}>
-                Marvin.
-              </motion.h1>
-            </div>
-
-            {/* Scribble underline */}
-            <motion.div className="w-[clamp(10rem,30vw,28rem)] mb-7"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}>
-              <ScribbleUnderline />
-            </motion.div>
-
-            {/* Role lines — weight contrast: bold / regular */}
-            <div className="overflow-hidden mb-1">
-              <motion.p variants={word}
-                className="font-display leading-[1.05] text-ink-900 dark:text-parchment-100"
-                style={{ fontSize: "clamp(1.9rem,4vw,3.8rem)", fontWeight: 600, letterSpacing: "-0.025em" }}>
-                UI/Web Designer
-              </motion.p>
-            </div>
-            <div className="overflow-hidden">
-              <motion.p variants={word}
-                className="font-display leading-[1.05] text-ink-400 dark:text-ink-500"
-                style={{ fontSize: "clamp(1.9rem,4vw,3.8rem)", fontWeight: 400, letterSpacing: "-0.02em" }}>
-                &amp; Creative Technologist.
-              </motion.p>
-            </div>
+          {/* Eyebrow */}
+          <motion.div variants={up} className="flex items-center gap-2 mb-8">
+            <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+            <span className="font-mono text-[12px] tracking-[0.15em] uppercase text-zinc-400 dark:text-zinc-500">
+              Graphic Designer &amp; Creative Technologist
+            </span>
           </motion.div>
-        </div>
 
-        {/* Bottom split */}
-        <motion.div
-          initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.0, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-6 md:gap-16 items-end mt-14 pt-7"
-          style={{ borderTop: "1px solid rgba(228,208,176,0.55)" }}>
-          <p className="font-sans text-base font-light leading-relaxed text-ink-500 dark:text-ink-400 max-w-[46ch]">
-            Crafting digital experiences at the intersection of
-            thoughtful design and artificial intelligence.
-          </p>
-          <div className="flex items-center gap-3">
-            <a href="#work"
-              className="inline-flex items-center gap-2 font-sans text-sm font-medium tracking-wide px-6 py-3 rounded-full transition-all active:scale-[0.97]"
-              style={{ background: "#b5451b", color: "#fdfaf5", boxShadow: "0 2px 14px rgba(181,69,27,0.28)" }}
-              onMouseEnter={e => e.currentTarget.style.background = "#d4612e"}
-              onMouseLeave={e => e.currentTarget.style.background = "#b5451b"}>
-              View Work
-            </a>
-            <a href="#about"
-              className="inline-flex items-center gap-2 font-sans text-sm font-medium tracking-wide px-6 py-3 rounded-full border border-parchment-300 dark:border-ink-600 text-ink-600 dark:text-ink-300 hover:border-parchment-400 dark:hover:border-ink-500 transition-all active:scale-[0.97]">
-              About
-            </a>
+          {/* Main headline — Apple-scale */}
+          <div className="overflow-hidden mb-3">
+            <motion.h1
+              variants={up}
+              className="text-[clamp(3.2rem,9vw,8.5rem)] font-bold leading-[0.95] tracking-[-0.04em] text-zinc-900 dark:text-zinc-50"
+            >
+              Hi, I&rsquo;m Marvin.
+            </motion.h1>
           </div>
-        </motion.div>
-      </motion.div>
 
-      {/* Scroll cue */}
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-        transition={{ delay: 1.6, duration: 0.6 }}
-        className="absolute bottom-16 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-ink-300 dark:text-ink-700">
-        <motion.div animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2.4, ease: "easeInOut" }}>
-          <ArrowDown size={13} weight="light" />
-        </motion.div>
-      </motion.div>
+          {/* Animated role line */}
+          <div className="overflow-hidden mb-8 h-[clamp(2.8rem,7.5vw,7rem)] flex items-center">
+            <AnimatePresence mode="wait">
+              <motion.p
+                key={roleIndex}
+                initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -16, filter: "blur(4px)" }}
+                transition={{ type: "spring", duration: 0.55, bounce: 0 }}
+                className="text-[clamp(2.8rem,7.5vw,7rem)] font-bold leading-[0.95] tracking-[-0.04em]"
+                style={{ color: "#5b45f5" }}
+              >
+                {ROLES[roleIndex]}
+              </motion.p>
+            </AnimatePresence>
+          </div>
 
-      {/* Marquee ticker */}
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden py-2.5"
-        style={{ borderTop: "1px solid rgba(228,208,176,0.4)" }}>
-        <div className="flex whitespace-nowrap" style={{ animation: "marquee 40s linear infinite" }}>
-          {marqueeWords.map((w, i) => (
-            <span key={i}
-              className="inline-flex items-center gap-4 mx-5 font-mono text-[10px] tracking-[0.22em] uppercase text-ink-300 dark:text-ink-700">
-              {w}
-              <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: "rgba(181,69,27,0.35)" }} />
+          {/* Sub copy */}
+          <motion.p
+            variants={up}
+            className="text-[16px] md:text-[18px] font-normal text-zinc-500 dark:text-zinc-400 max-w-[52ch] leading-relaxed mb-10"
+          >
+            I design things that work — and lately I build them too.
+            Based in Germany, focused on the intersection of
+            sharp visual craft and applied AI.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div variants={up} className="flex items-center gap-4 flex-wrap">
+            <MagneticButton href="#work" primary>
+              View Work <ArrowRight size={14} weight="bold" />
+            </MagneticButton>
+            <MagneticButton href="#contact">
+              Get in touch
+            </MagneticButton>
+          </motion.div>
+        </motion.div>
+
+        {/* Floating stat cards — Apple-style ambient info */}
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0, type: "spring", duration: 0.8, bounce: 0 }}
+          className="hidden lg:flex absolute right-10 top-1/2 -translate-y-1/2 flex-col gap-3"
+        >
+          {[
+            { label: "Years designing", value: "4+" },
+            { label: "B.A. Media Design", value: "2026" },
+            { label: "Tools mastered", value: "Figma" },
+          ].map((s, i) => (
+            <motion.div
+              key={s.label}
+              animate={{ y: [0, -5, 0] }}
+              transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut", delay: i * 0.8 }}
+              className="px-4 py-3 rounded-2xl text-right bg-white/80 dark:bg-zinc-900/80 border border-zinc-100 dark:border-zinc-800"
+              style={{
+                backdropFilter: "blur(12px)",
+                boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
+              }}
+            >
+              <p className="font-mono text-[11px] text-zinc-400 dark:text-zinc-600 mb-0.5 tracking-wide">{s.label}</p>
+              <p className="text-[15px] font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">{s.value}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+      </div>
+
+      {/* Bottom marquee ticker — dual-direction, Apple-subtle */}
+      <div className="absolute bottom-0 left-0 right-0 overflow-hidden border-t border-zinc-100 dark:border-zinc-900">
+        <div className="py-3 flex whitespace-nowrap" style={{ animation: "marquee 35s linear infinite" }}>
+          {["UI Design","Visual Identity","Figma","Branding","AI Integration","Vibe-Coding","Groq API","Typography","Art Direction","No-Code",
+            "UI Design","Visual Identity","Figma","Branding","AI Integration","Vibe-Coding","Groq API","Typography","Art Direction","No-Code"
+          ].map((w, i) => (
+            <span key={i} className="inline-flex items-center gap-3 mx-4 font-mono text-[11px] tracking-[0.18em] uppercase text-zinc-300 dark:text-zinc-700">
+              {w} <span className="w-1 h-1 rounded-full bg-accent/40 flex-shrink-0" />
             </span>
           ))}
         </div>

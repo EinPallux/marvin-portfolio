@@ -4,27 +4,29 @@ import { X, ArrowSquareOut } from "@phosphor-icons/react";
 
 const backdrop = {
   hidden: { opacity: 0 },
-  show:   { opacity: 1, transition: { duration: 0.28 } },
-  exit:   { opacity: 0, transition: { duration: 0.22, delay: 0.12 } },
+  show:   { opacity: 1, transition: { duration: 0.25 } },
+  exit:   { opacity: 0, transition: { duration: 0.2, delay: 0.1 } },
 };
-// Sheet: enters from below with blur+Y. Exits subtler (Jakub: exits less prominent than enters)
 const sheet = {
-  hidden: { opacity: 0, y: 60, filter: "blur(8px)" },
-  show:   { opacity: 1, y: 0,  filter: "blur(0px)",
-    transition: { type: "spring", duration: 0.55, bounce: 0 } },
-  exit:   { opacity: 0, y: 16, filter: "blur(4px)",
-    transition: { duration: 0.25, ease: [0.4, 0, 1, 1] } },
+  hidden: { opacity: 0, y: 56, filter: "blur(12px)", scale: 0.97 },
+  show:   { opacity: 1, y: 0, filter: "blur(0px)", scale: 1, transition: { type: "spring", duration: 0.55, bounce: 0 } },
+  exit:   { opacity: 0, y: 20, filter: "blur(4px)", scale: 0.98, transition: { duration: 0.22 } },
+};
+const bodyStagger = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.06, delayChildren: 0.3 } },
+};
+const bodyItem = {
+  hidden: { opacity: 0, y: 14, filter: "blur(4px)" },
+  show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { type: "spring", duration: 0.45, bounce: 0 } },
 };
 
 export default function ProjectModal({ project, onClose }) {
   useEffect(() => {
     document.body.style.overflow = "hidden";
-    const esc = (e) => e.key === "Escape" && onClose();
+    const esc = e => e.key === "Escape" && onClose();
     window.addEventListener("keydown", esc);
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", esc);
-    };
+    return () => { document.body.style.overflow = ""; window.removeEventListener("keydown", esc); };
   }, [onClose]);
 
   if (!project) return null;
@@ -32,135 +34,104 @@ export default function ProjectModal({ project, onClose }) {
   return (
     <AnimatePresence>
       <motion.div
-        variants={backdrop}
-        initial="hidden" animate="show" exit="exit"
-        className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-8"
+        variants={backdrop} initial="hidden" animate="show" exit="exit"
+        className="fixed inset-0 z-50 flex items-end md:items-center justify-center p-0 md:p-6"
         onClick={e => e.target === e.currentTarget && onClose()}
-        style={{ background: "rgba(16,14,11,0.78)", backdropFilter: "blur(14px)" }}
+        style={{ background: "rgba(0,0,0,0.7)", backdropFilter: "blur(16px)" }}
       >
         <motion.div
-          variants={sheet}
-          initial="hidden" animate="show" exit="exit"
-          className="relative w-full md:max-w-2xl max-h-[93dvh] md:max-h-[90dvh] overflow-y-auto hide-scrollbar bg-parchment-50 dark:bg-ink-900"
+          variants={sheet} initial="hidden" animate="show" exit="exit"
+          className="relative w-full md:max-w-[720px] max-h-[94dvh] md:max-h-[90dvh] overflow-y-auto hide-scrollbar bg-white dark:bg-zinc-900 rounded-t-3xl md:rounded-3xl"
           style={{
-            borderRadius: "6px 6px 0 0",
-            boxShadow: "0 40px 100px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04)",
-            willChange: "transform, opacity, filter",
+            boxShadow: "0 40px 100px rgba(0,0,0,0.4), 0 0 0 0.5px rgba(255,255,255,0.06)",
+            willChange: "transform, opacity",
           }}
         >
-          {/* Close button — animated icon swap (Jakub: opacity+scale+blur) */}
+          {/* Close */}
           <button
             onClick={onClose}
             aria-label="Close"
-            className="sticky top-4 mr-4 mt-4 z-10 flex w-8 h-8 items-center justify-center rounded-full border text-ink-400 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors active:scale-95"
-            style={{
-              float: "right",
-              borderColor: "rgba(164,140,112,0.45)",
-              background: "rgba(253,250,245,0.92)",
-              transition: "background 0.15s, color 0.15s, transform 0.1s",
-            }}
+            className="sticky top-4 ml-auto mr-4 mt-4 z-10 flex w-8 h-8 items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 transition-all active:scale-95"
+            style={{ float: "right" }}
           >
-            <X size={12} weight="bold" />
+            <X size={13} weight="bold" />
           </button>
 
-          {/* Hero image — clip-path reveal */}
-          <div className="relative overflow-hidden aspect-[16/7]" style={{ borderRadius: "6px 6px 0 0" }}>
+          {/* Hero image with clip-path reveal */}
+          <div className="relative aspect-[16/7] overflow-hidden rounded-t-3xl md:rounded-t-3xl">
             <motion.div
               className="w-full h-full"
               initial={{ clipPath: "inset(100% 0 0 0)" }}
               animate={{ clipPath: "inset(0% 0 0 0)" }}
-              transition={{ duration: 0.7, delay: 0.1, ease: [0.77, 0, 0.18, 1] }}
+              transition={{ duration: 0.65, delay: 0.1, ease: [0.77, 0, 0.18, 1] }}
             >
               <img src={project.coverImage} alt={project.title} className="w-full h-full object-cover" />
             </motion.div>
-            <div className="absolute inset-0"
-              style={{ background: "linear-gradient(to top, rgba(16,14,11,0.65) 0%, transparent 55%)" }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
             <motion.div
-              className="absolute bottom-5 left-6 right-12"
-              initial={{ opacity: 0, y: 12 }}
+              className="absolute bottom-5 left-6 right-14"
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45, type: "spring", duration: 0.5, bounce: 0 }}
+              transition={{ delay: 0.4, type: "spring", duration: 0.5, bounce: 0 }}
             >
-              <span className="inline-block font-mono text-[10px] tracking-[0.2em] uppercase px-2 py-0.5 mb-2"
-                style={{ background: "rgba(181,69,27,0.72)", color: "#fdfaf5", borderRadius: "2px" }}>
+              <span className="inline-block font-mono text-[10px] tracking-[0.18em] uppercase px-2.5 py-1 rounded-full mb-2 bg-accent text-white">
                 {project.category}
               </span>
-              {/* Fixed: merged style props — was two separate style attributes (React bug) */}
-              <h2 className="font-display leading-tight"
-                style={{ fontSize: "clamp(1.4rem,3vw,1.9rem)", fontWeight: 600, letterSpacing: "-0.02em", color: "#fdfaf5" }}>
+              <h2 className="text-[1.5rem] md:text-[2rem] font-bold tracking-[-0.03em] leading-tight text-white">
                 {project.title}
               </h2>
             </motion.div>
           </div>
 
-          {/* Body — staggered section reveals */}
+          {/* Body */}
           <motion.div
+            variants={bodyStagger} initial="hidden" animate="show"
             className="px-6 md:px-8 py-8 space-y-8"
-            initial="hidden"
-            animate="show"
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07, delayChildren: 0.3 } } }}
           >
-            {/* Tags */}
-            <motion.div
-              className="flex flex-wrap gap-2"
-              variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { type: "spring", duration: 0.4, bounce: 0 } } }}
-            >
-              {project.tags.map(tag => (
-                <span key={tag}
-                  className="font-mono text-[10px] tracking-wide px-2.5 py-1 text-ink-400 dark:text-ink-500"
-                  style={{ border: "1px solid rgba(164,140,112,0.4)", borderRadius: "2px" }}>
-                  {tag}
+            {/* Tags + year */}
+            <motion.div variants={bodyItem} className="flex flex-wrap gap-2">
+              {project.tags.map(t => (
+                <span key={t} className="font-mono text-[11px] px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400">
+                  {t}
                 </span>
               ))}
-              <span className="font-mono text-[10px] tracking-wide px-2.5 py-1 text-ink-400"
-                style={{ border: "1px dashed rgba(164,140,112,0.35)", borderRadius: "2px" }}>
+              <span className="font-mono text-[11px] px-3 py-1 rounded-full border border-dashed border-zinc-200 dark:border-zinc-700 text-zinc-400">
                 {project.year}
               </span>
             </motion.div>
 
-            <motion.div style={{ borderTop: "1px solid rgba(228,208,176,0.55)" }}
-              variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.3 } } }} />
+            <motion.div variants={bodyItem} className="h-px bg-zinc-100 dark:bg-zinc-800" />
 
             {/* Overview */}
-            <motion.div
-              variants={{ hidden: { opacity: 0, y: 14, filter: "blur(4px)" }, show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { type: "spring", duration: 0.5, bounce: 0 } } }}
-            >
-              <p className="font-mono text-[10px] tracking-[0.22em] uppercase mb-3" style={{ color: "#b5451b" }}>Overview</p>
-              <p className="font-display text-xl md:text-2xl leading-snug text-ink-700 dark:text-ink-300"
-                style={{ fontWeight: 400, letterSpacing: "-0.015em" }}>
+            <motion.div variants={bodyItem}>
+              <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-accent mb-3">Overview</p>
+              <p className="text-[17px] md:text-[19px] font-medium leading-snug tracking-tight text-zinc-800 dark:text-zinc-200">
                 {project.overview}
               </p>
             </motion.div>
 
             {/* Challenge + Solution */}
-            <motion.div
-              className="grid grid-cols-1 md:grid-cols-2 gap-5"
-              variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { type: "spring", duration: 0.5, bounce: 0 } } }}
-            >
+            <motion.div variants={bodyItem} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[{ label: "Challenge", text: project.challenge }, { label: "Solution", text: project.solution }].map(({ label, text }) => (
-                <div key={label} className="p-5"
-                  style={{ background: "rgba(241,230,208,0.5)", borderRadius: "3px" }}>
-                  <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-ink-400 mb-2">{label}</p>
-                  <p className="font-sans text-sm font-light leading-relaxed text-ink-600 dark:text-ink-300">{text}</p>
+                <div key={label} className="p-5 rounded-2xl bg-zinc-50 dark:bg-zinc-800/60 border border-zinc-100 dark:border-zinc-800">
+                  <p className="font-mono text-[10px] tracking-[0.18em] uppercase text-zinc-400 dark:text-zinc-500 mb-2">{label}</p>
+                  <p className="text-[13px] text-zinc-600 dark:text-zinc-400 leading-relaxed">{text}</p>
                 </div>
               ))}
             </motion.div>
 
             {/* Results */}
             {project.results?.length > 0 && (
-              <motion.div
-                variants={{ hidden: { opacity: 0, y: 14 }, show: { opacity: 1, y: 0, transition: { type: "spring", duration: 0.5, bounce: 0 } } }}
-              >
-                <p className="font-mono text-[10px] tracking-[0.22em] uppercase mb-4" style={{ color: "#b5451b" }}>Results</p>
+              <motion.div variants={bodyItem}>
+                <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-accent mb-4">Results</p>
                 <div className="space-y-3">
                   {project.results.map((r, i) => (
-                    <motion.div key={i} className="flex items-start gap-3"
-                      initial={{ opacity: 0, x: -12 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.55 + i * 0.06, type: "spring", duration: 0.4, bounce: 0 }}>
-                      <span className="font-mono text-xs flex-shrink-0 mt-px" style={{ color: "#b5451b" }}>0{i + 1}</span>
-                      <p className="font-sans text-sm font-light text-ink-600 dark:text-ink-300 leading-snug">{r}</p>
-                    </motion.div>
+                    <div key={i} className="flex items-start gap-3">
+                      <span className="w-5 h-5 rounded-full bg-accent/10 text-accent flex items-center justify-center font-mono text-[10px] font-bold flex-shrink-0 mt-0.5">
+                        {i + 1}
+                      </span>
+                      <p className="text-[14px] text-zinc-700 dark:text-zinc-300 leading-snug">{r}</p>
+                    </div>
                   ))}
                 </div>
               </motion.div>
@@ -168,17 +139,17 @@ export default function ProjectModal({ project, onClose }) {
 
             {/* Gallery */}
             {project.images?.length > 0 && (
-              <motion.div
-                variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.4 } } }}
-              >
-                <p className="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-400 mb-4">Process &amp; Gallery</p>
-                <div className="grid grid-cols-1 gap-3">
+              <motion.div variants={bodyItem}>
+                <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-zinc-400 mb-4">Gallery</p>
+                <div className="space-y-3">
                   {project.images.map((img, i) => (
-                    <motion.div key={i}
+                    <motion.div
+                      key={i}
                       initial={{ opacity: 0, clipPath: "inset(100% 0 0 0)" }}
                       animate={{ opacity: 1, clipPath: "inset(0% 0 0 0)" }}
-                      transition={{ delay: 0.7 + i * 0.1, duration: 0.65, ease: [0.77, 0, 0.18, 1] }}
-                      style={{ borderRadius: "3px", overflow: "hidden", border: "1px solid rgba(228,208,176,0.55)" }}>
+                      transition={{ delay: 0.65 + i * 0.1, duration: 0.6, ease: [0.77, 0, 0.18, 1] }}
+                      className="rounded-xl overflow-hidden border border-zinc-100 dark:border-zinc-800"
+                    >
                       <img src={img} alt={`${project.title} ${i + 1}`} className="w-full object-cover" loading="lazy" />
                     </motion.div>
                   ))}
@@ -187,23 +158,17 @@ export default function ProjectModal({ project, onClose }) {
             )}
 
             {/* CTAs */}
-            <motion.div
-              className="flex gap-3 pt-3 pb-1"
-              style={{ borderTop: "1px solid rgba(228,208,176,0.45)" }}
-              variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.35 } } }}
-            >
+            <motion.div variants={bodyItem} className="flex gap-3 pt-2 pb-1 border-t border-zinc-100 dark:border-zinc-800">
               {project.liveUrl && (
                 <a href={project.liveUrl} target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-2 font-sans text-sm font-medium px-5 py-2.5 rounded-full transition-all active:scale-[0.97]"
-                  style={{ background: "#b5451b", color: "#fdfaf5" }}>
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-semibold bg-accent text-white hover:bg-accent-hover transition-colors active:scale-[0.97]">
                   Live Project <ArrowSquareOut size={13} />
                 </a>
               )}
               {project.caseStudyUrl && (
                 <a href={project.caseStudyUrl} target="_blank" rel="noreferrer"
-                  className="inline-flex items-center gap-2 font-sans text-sm font-medium px-5 py-2.5 rounded-full border transition-all active:scale-[0.97]"
-                  style={{ borderColor: "rgba(164,140,112,0.45)", color: "#5a5240" }}>
-                  Full Case Study <ArrowSquareOut size={13} />
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-[13px] font-semibold border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors active:scale-[0.97]">
+                  Case Study <ArrowSquareOut size={13} />
                 </a>
               )}
             </motion.div>

@@ -1,25 +1,14 @@
 import { createContext, useContext, useEffect, useState } from "react";
-
-const ThemeContext = createContext(null);
-
+const Ctx = createContext(null);
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(() => {
-    const stored = localStorage.getItem("marvin-theme");
-    if (stored) return stored;
-    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    const s = localStorage.getItem("mv-theme");
+    return s || (window.matchMedia("(prefers-color-scheme:dark)").matches ? "dark" : "light");
   });
-
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("marvin-theme", theme);
+    localStorage.setItem("mv-theme", theme);
   }, [theme]);
-
-  const toggle = () => setTheme(t => t === "dark" ? "light" : "dark");
-  return <ThemeContext.Provider value={{ theme, toggle }}>{children}</ThemeContext.Provider>;
+  return <Ctx.Provider value={{ theme, toggle: () => setTheme(t => t === "dark" ? "light" : "dark") }}>{children}</Ctx.Provider>;
 }
-
-export function useTheme() {
-  const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error("useTheme must be used inside ThemeProvider");
-  return ctx;
-}
+export const useTheme = () => { const c = useContext(Ctx); if (!c) throw Error(); return c; };

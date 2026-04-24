@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun } from "@phosphor-icons/react";
 import { useTheme } from "../context/ThemeContext";
@@ -8,63 +8,82 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const fn = () => setScrolled(window.scrollY > 60);
+    const fn = () => setScrolled(window.scrollY > 48);
     window.addEventListener("scroll", fn, { passive: true });
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  const borderColor = theme === "dark"
-    ? "rgba(61,56,40,0.55)"
-    : "rgba(228,208,176,0.65)";
-  const bg = theme === "dark"
-    ? "rgba(16,14,11,0.9)"
-    : "rgba(253,250,245,0.9)";
-
   return (
     <motion.header
-      initial={{ opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-      className="fixed top-0 left-0 right-0 z-40 transition-all duration-500"
-      style={{
-        background: scrolled ? bg : "transparent",
-        backdropFilter: scrolled ? "blur(18px) saturate(160%)" : "none",
-        borderBottom: `1px solid ${scrolled ? borderColor : "transparent"}`,
-      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6, delay: 0.1 }}
+      className="fixed top-0 inset-x-0 z-50"
     >
-      <div className="max-w-[1320px] mx-auto px-6 md:px-12 flex items-center justify-between h-16">
-        {/* Logo — NO italic, Clash Display has no italic variant */}
-        <a href="#"
-          className="font-display text-xl tracking-tight text-ink-900 dark:text-parchment-100"
-          style={{ fontWeight: 600, letterSpacing: "-0.02em" }}>
-          Marvin
-          <span style={{ color: "#b5451b", fontWeight: 400 }}>.</span>
-        </a>
+      <div
+        className="transition-all duration-300"
+        style={{
+          background: scrolled
+            ? theme === "dark"
+              ? "rgba(10,10,11,0.82)"
+              : "rgba(255,255,255,0.82)"
+            : "transparent",
+          backdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(20px) saturate(180%)" : "none",
+          borderBottom: scrolled
+            ? theme === "dark"
+              ? "0.5px solid rgba(255,255,255,0.08)"
+              : "0.5px solid rgba(0,0,0,0.08)"
+            : "0.5px solid transparent",
+        }}
+      >
+        <div className="max-w-[1200px] mx-auto px-6 md:px-10 h-14 flex items-center justify-between">
+          {/* Wordmark */}
+          <a
+            href="#"
+            className="text-[15px] font-semibold tracking-[-0.02em] text-zinc-900 dark:text-zinc-100"
+          >
+            Marvin
+          </a>
 
-        <div className="flex items-center gap-1">
-          <nav className="hidden md:flex items-center mr-4">
-            {["About", "Skills", "Work"].map(item => (
-              <a key={item} href={`#${item.toLowerCase()}`}
-                className="px-4 py-2 font-sans text-sm font-medium text-ink-400 dark:text-ink-400 hover:text-ink-900 dark:hover:text-parchment-100 transition-colors">
-                {item}
+          {/* Center nav links — hidden on mobile */}
+          <nav className="hidden md:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+            {[["About", "#about"], ["Skills", "#skills"], ["Work", "#work"], ["Contact", "#contact"]].map(([label, href]) => (
+              <a
+                key={label}
+                href={href}
+                className="px-3.5 py-1.5 text-[13px] font-medium text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800/60 transition-all duration-150"
+              >
+                {label}
               </a>
             ))}
           </nav>
 
-          <button onClick={toggle} aria-label="Toggle theme"
-            className="w-9 h-9 flex items-center justify-center rounded-full border text-ink-400 dark:text-ink-400 hover:text-ink-900 dark:hover:text-parchment-100 transition-all active:scale-95"
-            style={{ borderColor: "rgba(164,140,112,0.4)" }}>
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.span key={theme}
-                initial={{ rotate: -20, opacity: 0, scale: 0.7, filter: "blur(4px)" }}
-                animate={{ rotate: 0, opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ rotate: 20, opacity: 0, scale: 0.7, filter: "blur(4px)" }}
-                transition={{ type: "spring", duration: 0.35, bounce: 0 }}
-                className="absolute">
-                {theme === "dark" ? <Sun size={14} weight="light" /> : <Moon size={14} weight="light" />}
-              </motion.span>
-            </AnimatePresence>
-          </button>
+          {/* Right: availability badge + theme */}
+          <div className="flex items-center gap-3">
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-medium bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800/60">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" style={{ animation: "pulse 2s infinite" }} />
+              Available
+            </span>
+            <button
+              onClick={toggle}
+              aria-label="Toggle theme"
+              className="w-8 h-8 flex items-center justify-center rounded-lg text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all active:scale-95"
+            >
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.span
+                  key={theme}
+                  initial={{ opacity: 0, scale: 0.7, filter: "blur(4px)" }}
+                  animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
+                  exit={{ opacity: 0, scale: 0.7, filter: "blur(4px)" }}
+                  transition={{ type: "spring", duration: 0.3, bounce: 0 }}
+                  className="absolute"
+                >
+                  {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
+                </motion.span>
+              </AnimatePresence>
+            </button>
+          </div>
         </div>
       </div>
     </motion.header>
