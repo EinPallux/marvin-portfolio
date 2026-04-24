@@ -157,19 +157,6 @@ export default function Hero() {
           ))}
         </motion.div>
       </div>
-
-      {/* Bottom marquee ticker — dual-direction, Apple-subtle */}
-      <div className="absolute bottom-0 left-0 right-0 overflow-hidden border-t border-zinc-100 dark:border-zinc-900">
-        <div className="py-3 flex whitespace-nowrap" style={{ animation: "marquee 35s linear infinite" }}>
-          {["UI Design","Visual Identity","Figma","Branding","AI Integration","Vibe-Coding","Groq API","Typography","Art Direction","No-Code",
-            "UI Design","Visual Identity","Figma","Branding","AI Integration","Vibe-Coding","Groq API","Typography","Art Direction","No-Code"
-          ].map((w, i) => (
-            <span key={i} className="inline-flex items-center gap-3 mx-4 font-mono text-[11px] tracking-[0.18em] uppercase text-zinc-300 dark:text-zinc-700">
-              {w} <span className="w-1 h-1 rounded-full bg-accent/40 flex-shrink-0" />
-            </span>
-          ))}
-        </div>
-      </div>
     </section>
   );
 }

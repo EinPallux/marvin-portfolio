@@ -1,7 +1,7 @@
 import { ThemeProvider } from "./context/ThemeContext";
 import Nav from "./components/Nav";
 import Hero from "./components/Hero";
-import StatsBand from "./components/StatsBand";
+import ClientsBand from "./components/ClientsBand";
 import About from "./components/About";
 import Skills from "./components/Skills";
 import Gallery from "./components/Gallery";
@@ -17,7 +17,7 @@ export default function App() {
       <Nav />
       <main>
         <Hero />
-        <StatsBand />
+        <ClientsBand />
         <About />
         <Skills />
         <Gallery />
